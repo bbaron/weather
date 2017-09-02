@@ -1,3 +1,5 @@
+import "bootstrap/dist/css/bootstrap.css";
+import {Navbar, NavItem, Nav, Grid, Row, Col} from "react-bootstrap"
 import React, {Component} from 'react';
 import './App.css';
 
@@ -17,9 +19,9 @@ class WeatherDisplay extends Component {
   }
 
   componentDidMount() {
-    const zip = this.props.zip;
+    const place = this.props.place;
     const URL = "http://api.openweathermap.org/data/2.5/weather?q=" +
-      zip +
+      place.zip +
       "&appid=b1b35bba8b434a28a0be2a3e1071ae5b&units=imperial";
     fetch(URL)
       .then(res => res.json())
@@ -32,9 +34,6 @@ class WeatherDisplay extends Component {
     const weatherData = this.state.weatherData;
     if (!weatherData) return <div>Loading</div>;
     const weather = weatherData.weather[0];
-    console.log(weatherData);
-    console.log(weather);
-    console.log('weather.main = ' + weather.main);
     const iconUrl = "http://openweathermap.org/img/w/" + weather.icon + ".png";
     return (
       <div>
@@ -62,20 +61,33 @@ class App extends Component {
   render() {
     const activePlace = this.state.activePlace;
     return (
-      <div className="App">
-        {PLACES.map((place, index) => (
-          <button key={index} onClick={
-            () => {
-              this.setState({activePlace: index})
-            }
-          }
-          >
-            {place.name}
-          </button>
-        ))}
-        <WeatherDisplay
-          key={activePlace}
-          zip={PLACES[activePlace].zip}/>
+      <div>
+        <Navbar>
+          <Navbar.Header>
+            <Navbar.Brand>
+              React Simple Weather App
+            </Navbar.Brand>
+          </Navbar.Header>
+        </Navbar>
+        <Grid>
+          <Row>
+            <Col md={4} sm={4}>
+              <h3>Select a city</h3>
+              <Nav bsStyle="pills" stacked activeKey={activePlace}
+                   onSelect={index => {
+                     this.setState({activePlace: index})
+                   }}>
+
+                {PLACES.map((place, index) => (
+                  <NavItem key={index} eventKey={index}>{place.name}</NavItem>
+                ))}
+              </Nav>
+            </Col>
+            <Col md={8} sm={8}>
+              <WeatherDisplay key={activePlace} place={PLACES[activePlace]}/>
+            </Col>
+          </Row>
+        </Grid>
       </div>
     );
   }
